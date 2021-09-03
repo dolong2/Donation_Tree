@@ -1,4 +1,4 @@
-function getUser() {
+/*function getUser() {
         
     const config = {
       method: "get"
@@ -43,4 +43,25 @@ function to_ajax(){
             alert(json)
         },
     });
+}*/
+
+$(function (){
+    $("#lgbtn").click(login);
+});
+function login(){
+    let id=$('.id').val();
+    let pw=$('.pw').val();
+    $.ajax({
+        type:'post',
+        url:'/login',
+        data:"id="+id+'&'+'password='+pw,
+        dataType:'application/json',
+        succes:(data)=>{
+            console.log(data);
+        },
+        error:()=>{
+            console.log("error");
+        }
+    });
+    console.log(id,pw);
 }

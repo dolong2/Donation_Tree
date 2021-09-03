@@ -47,6 +47,7 @@ app.post('/login',(req,res)=>{
     var id=req.body.id;
     conn.query("select name,salt,password from tree_user where id=?",[id],(err,result)=>{
         if(result.length==0){
+            console.log(req.body);
             console.log("로그인 실패(id 틀림)");
             res.send({"login":"입력하신 아이디가 존재하지 않습니다"});
         }
@@ -222,17 +223,5 @@ app.get('/mypage',(req,res)=>{
         });
     });
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
-
-//------------------------------------------------------------------페이지 요청---------------------------------------------------------
-
-app.post('/getMypage',(req,res)=>{
-    res.sendFile('mypage.html',{root:"../public/html/"});
-});
-app.post('/getLogin',(req,res)=>{
-    res.sendFile('login.html',{root:'../public/html/'})
-});
-app.post('/getList',(req,res)=>{
-    res.sendFile('list.html',{root:'../public/html/'})
-});
 
 app.listen(3000, console.log('Server running on Port 3000'));
