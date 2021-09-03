@@ -3,7 +3,7 @@ var mysql = require('mysql');
 const crypto = require('crypto');
 const session = require('express-session');
 const multer = require('multer');
-const path='../';
+const path=require('path');
 
 const db_infor=require("../infor/db_infor.json");
 const storage = multer.diskStorage({
@@ -23,8 +23,8 @@ var conn = mysql.createConnection({
 conn.connect();
 
 const app = express();
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
-app.use(express.static('public'));
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
@@ -32,7 +32,7 @@ app.use(session({
 }));
 
 app.get('/',(req,res)=>{
-    res.sendFile('main.html',{root:'../public/html/'});
+    res.sendFile('logintree.html',{root:'../public/HTML/'});
 });//메인페이지로딩
 
 app.post('/loginCheck', (req, res) => {
