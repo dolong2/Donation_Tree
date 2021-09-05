@@ -3,8 +3,9 @@ var mysql = require('mysql');
 const crypto = require('crypto');
 const session = require('express-session');
 const multer = require('multer');
-var request = require('request');
+const request = require('request');
 const path=require('path');
+const convert=require('xml-js');
 
 const db_infor=require("../infor/db_infor.json");
 const volunteer_infor=require("../infor/volunteer_infor.json");
@@ -226,7 +227,20 @@ app.get('/mypage',(req,res)=>{
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
 
 app.post('/AIeducation_data',(req,res)=>{
-    
+    var url='http://openapi.1365.go.kr/openapi/service/rest/CodeInquiryService/getVltrRealmCodeList';
+    url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
+    url+='&'+encodeURIComponent('clsType')+'='+encodeURIComponent('B');
+    url+='&'+encodeURIComponent('highClsNm')+'='+encodeURIComponent('환경보호');
+    var result;
+    request({
+        url:url,
+        method:"GET"
+    },(err,res,body)=>{
+        result=res.body;
+        result = convert.xml2json(result, {compact: true, spaces: 4});//json으로 변환
+        console.log(result)
+    });
+    res.send(result);
 });//0800(환경 카테고리)-행정안전부_코드조회서비스 참고
 
 app.listen(3000, console.log('Server running on Port 3000'));
