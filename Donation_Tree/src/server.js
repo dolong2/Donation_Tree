@@ -3,16 +3,17 @@ var mysql = require('mysql');
 const crypto = require('crypto');
 const session = require('express-session');
 const multer = require('multer');
+var request = require('request');
 const path=require('path');
 
 const db_infor=require("../infor/db_infor.json");
+const volunteer_infor=require("../infor/volunteer_infor.json");
 const storage = multer.diskStorage({
     destination: "./public/img/",
     filename: function(req, file, cb) {
       cb(null, "imgfile" + Date.now() + path.extname(file.originalname));
     }
-  });
-const { request } = require('http');
+});
 
 var conn = mysql.createConnection({
     host : db_infor.host,  
@@ -223,5 +224,21 @@ app.get('/mypage',(req,res)=>{
         });
     });
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
+
+app.post('/AIeducation_data',(req,res)=>{
+    var url='http://openapi.1365.go.kr/openapi/service/rest/CodeInquiryService/getVltrRealmCodeList';
+    url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
+    url+='&'+encodeURIComponent('clsType')+'='+encodeURIComponent('B');
+    url+='&'+encodeURIComponent('highClsNm')+'='+encodeURIComponent('%ed%99%98%ea%b2%bd%eb%b3%b4%ed%98%b8');
+    var result;
+    request({
+        url:url,
+        method:"GET"
+    },(err,res,body)=>{
+        result=res.body;
+        console.log(body);
+    });
+    res.send(result);
+});//0800(환경 카테고리)
 
 app.listen(3000, console.log('Server running on Port 3000'));
