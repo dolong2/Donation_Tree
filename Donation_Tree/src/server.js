@@ -226,19 +226,7 @@ app.get('/mypage',(req,res)=>{
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
 
 app.post('/AIeducation_data',(req,res)=>{
-    var url='http://openapi.1365.go.kr/openapi/service/rest/CodeInquiryService/getVltrRealmCodeList';
-    url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
-    url+='&'+encodeURIComponent('clsType')+'='+encodeURIComponent('B');
-    url+='&'+encodeURIComponent('highClsNm')+'='+encodeURIComponent('%ed%99%98%ea%b2%bd%eb%b3%b4%ed%98%b8');
-    var result;
-    request({
-        url:url,
-        method:"GET"
-    },(err,res,body)=>{
-        result=res.body;
-        console.log(body);
-    });
-    res.send(result);
-});//0800(환경 카테고리)
+    
+});//0800(환경 카테고리)-행정안전부_코드조회서비스 참고
 
 app.listen(3000, console.log('Server running on Port 3000'));
