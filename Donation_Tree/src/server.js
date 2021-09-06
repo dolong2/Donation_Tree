@@ -227,20 +227,18 @@ app.get('/mypage',(req,res)=>{
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
 
 app.post('/AIeducation_data',(req,res)=>{
-    var url='http://openapi.1365.go.kr/openapi/service/rest/CodeInquiryService/getVltrRealmCodeList';
+    var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
-    url+='&'+encodeURIComponent('clsType')+'='+encodeURIComponent('B');
-    url+='&'+encodeURIComponent('highClsNm')+'='+encodeURIComponent('환경보호');
-    var result;
+    url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
+    var result,xmltojson;
     request({
         url:url,
         method:"GET"
-    },(err,res,body)=>{
-        result=res.body;
-        result = convert.xml2json(result, {compact: true, spaces: 4});//json으로 변환
-        console.log(result)
+    },(err,ress,body)=>{
+        result=body;
+        xmltojson=convert.xml2json(result, {compact: true, spaces: 4,strict: false});
+        res.json(xmltojson);
     });
-    res.send(result);
-});//0800(환경 카테고리)-행정안전부_코드조회서비스 참고
+});//저작자: 행정 안전부
 
 app.listen(3000, console.log('Server running on Port 3000'));
