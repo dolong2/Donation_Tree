@@ -238,13 +238,12 @@ app.post('/get_volunteer_data',(req,res)=>{
         result=body;
         result=convert.xml2json(result, {compact: true, spaces: 4,strict: false});
         var json=JSON.parse(result).response.body
-        console.log(json.items.item[0]);
         for(let a of json.items.item){
-            console.log(a);
-            conn.query('select * from volunteer_list where volunteer_id=?',[a.progrmRegistNo],(err,result)=>{
-                if(err){
-                    conn.query('insert into volunteer_list set(?,?,?,?,?)',[a.progrmRegistNo,a.progrmSj,a.nanmmbyNm,a.progrmBgnde,a.progrmEndde]);
+            conn.query('select * from volunteer_list where volunteer_id=?',[a.progrmRegistNo._text],(err,result)=>{
+                if(result.length==0){
+                    conn.query('insert into volunteer_list value(?,?,?,?,?)',[a.progrmRegistNo._text,a.progrmSj._text,a.nanmmbyNm._text,a.progrmBgnde._text,a.progrmEndde._text]);
                 }
+                console.log(a.progrmRegistNo._text,a.progrmSj._text,a.nanmmbyNm._text,a.progrmBgnde._text,a.progrmEndde._text);
             });
         } 
         res.send(json.items.item);
