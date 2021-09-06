@@ -226,18 +226,28 @@ app.get('/mypage',(req,res)=>{
     });
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
 
-app.post('/AIeducation_data',(req,res)=>{
+app.post('/get_volunteer_data',(req,res)=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
     url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
-    var result,xmltojson;
+    var result;
     request({
         url:url,
         method:"GET"
     },(err,ress,body)=>{
         result=body;
-        xmltojson=convert.xml2json(result, {compact: true, spaces: 4,strict: false});
-        res.json(xmltojson);
+        result=convert.xml2json(result, {compact: true, spaces: 4,strict: false});
+        var json=JSON.parse(result).response.body
+        console.log(json.items.item[0]);
+        for(let a of json.items.item){
+            console.log(a);
+            conn.query('select * from volunteer_list where volunteer_id=?',[a.progrmRegistNo],(err,result)=>{
+                if(err){
+                    conn.query('insert into volunteer_list set(?,?,?,?,?)',[a.progrmRegistNo,a.progrmSj,a.nanmmbyNm,a.progrmBgnde,a.progrmEndde]);
+                }
+            });
+        } 
+        res.send(json.items.item);
     });
 });//저작자: 행정 안전부
 
