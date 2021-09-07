@@ -230,6 +230,7 @@ app.post('/get_volunteer_data',(req,res)=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
     url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
+    var date=new Date();
     date.getFullYear()
     var result;
     request({
