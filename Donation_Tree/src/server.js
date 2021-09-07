@@ -230,6 +230,7 @@ app.post('/get_volunteer_data',(req,res)=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
     url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
+    date.getFullYear()
     var result;
     request({
         url:url,
@@ -243,11 +244,12 @@ app.post('/get_volunteer_data',(req,res)=>{
                 if(result.length==0){
                     conn.query('insert into volunteer_list value(?,?,?,?,?)',[a.progrmRegistNo._text,a.progrmSj._text,a.nanmmbyNm._text,a.progrmBgnde._text,a.progrmEndde._text]);
                 }
-                console.log(a.progrmRegistNo._text,a.progrmSj._text,a.nanmmbyNm._text,a.progrmBgnde._text,a.progrmEndde._text);
             });
         } 
         res.send(json.items.item);
     });
 });//저작자: 행정 안전부
+
+
 
 app.listen(3000, console.log('Server running on Port 3000'));
