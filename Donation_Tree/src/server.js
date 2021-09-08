@@ -264,6 +264,6 @@ app.post('/clear_volunteer_list',(req,res)=>{
             res.send(true);
         }
     });
-});
+});//마감일이 지난 리스트를 삭제
 
 app.listen(3000, console.log('Server running on Port 3000'));
