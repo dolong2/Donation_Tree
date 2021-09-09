@@ -2,19 +2,12 @@ const express = require('express');
 var mysql = require('mysql');
 const crypto = require('crypto');
 const session = require('express-session');
-const multer = require('multer');
 const request = require('request');
 const path=require('path');
 const convert=require('xml-js');
 
 const db_infor=require("../infor/db_infor.json");
 const volunteer_infor=require("../infor/volunteer_infor.json");
-const storage = multer.diskStorage({
-    destination: "./public/img/",
-    filename: function(req, file, cb) {
-      cb(null, "imgfile" + Date.now() + path.extname(file.originalname));
-    }
-});
 
 var conn = mysql.createConnection({
     host : db_infor.host,  
@@ -37,6 +30,7 @@ app.get('/',(req,res)=>{
     res.sendFile('logintree.html',{root:'../public/HTML/'});
 });//메인페이지로딩
 
+//로그인 관련
 app.post('/loginCheck', (req, res) => {
    if(req.session.userid&&req.session.username) {
        res.send({"logged":true,"name":req.session.username});
@@ -93,13 +87,7 @@ app.post('/logout',(req,res)=>{
     res.send({"message":"로그아웃 되셨습니다"});
 });//로그아웃
 
-/*app.post("/upload", storage.single("selectImg"), (req, res) => {
-    console.log(req.file);
-    res.send({
-        fileName: req.file.filename
-    });
-});//웹페이지랑 연결되야 테스트 할 수 있을듯*/
-
+//봉사 정보관련
 app.get('/volunteerTier',(req,res)=>{
     if(req.session.userid&&req.session.username){
         conn.query("select volunteer_hour from tree_user where id=?",[req.session.userid],(err,result)=>{
@@ -226,6 +214,7 @@ app.get('/mypage',(req,res)=>{
     });
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
 
+//기타?
 app.post('/get_volunteer_data',(req,res)=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
@@ -248,7 +237,6 @@ app.post('/get_volunteer_data',(req,res)=>{
         res.send(json.items.item);
     });
 });//저작자: 행정 안전부
-
 app.post('/clear_volunteer_list',(req,res)=>{
     var date=new Date(),str;
     var year=date.getFullYear();
