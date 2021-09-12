@@ -244,7 +244,7 @@ app.post('/clear_volunteer_list',(req,res)=>{
     var day=date.getDate()<10?("0"+(date.getDate())):String(date.getDate());
     str=Number(year+month+day);
     console.log(str);
-    conn.query('delete from volunteer_list where end_date=?',[str],(err,result)=>{
+    conn.query('delete from volunteer_list where end_date<?',[str],(err,result)=>{
         if(err){
             res.send(false);
         }
