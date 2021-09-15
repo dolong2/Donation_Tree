@@ -254,4 +254,31 @@ app.post('/clear_volunteer_list',(req,res)=>{
     });
 });//마감일이 지난 리스트를 삭제
 
+app.get('/like',(req,res)=>{
+    let id=req.query.id;
+    let user=req.query.user;
+    let score=req.query.score;
+    conn.query('insert into likes value(?,?,?)',[user,id,score],(err,result)=>{
+        if(err){
+            console.log(err);
+            res.send("값이 다름 다시 입력하셈");
+        }
+    });
+    console.log("좋아요 삽입");
+    res.send("완료");
+});//임시로 좋아요를 표시하는 요청 처리
+
+app.post('/like',(req,res)=>{
+    let id=req.body.id;
+    let user=req.body.user;
+    let score=req.body.score;
+    conn.query('insert into likes value(?,?,?)',[user,id,score],(err,result)=>{
+        if(err){
+            console.log(err);
+            res.send("값이 다름 다시 입력하셈");
+        }
+    });
+});
+
+
 app.listen(3000, console.log('Server running on Port 3000'));
