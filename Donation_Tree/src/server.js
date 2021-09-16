@@ -258,7 +258,7 @@ app.get('/like',(req,res)=>{
     let id=req.query.id;
     let user=req.query.user;
     let score=req.query.score;
-    conn.query('insert into likes value(?,?,?)',[user,id,score],(err,result)=>{
+    conn.query('insert into likes(id,title,score) value(?,?,?)',[user,id,score],(err,result)=>{
         if(err){
             console.log(err);
             res.send("값이 다름 다시 입력하셈");
