@@ -1,5 +1,5 @@
 const express = require('express');
-var mysql = require('mysql');
+const mysql = require('mysql');
 const crypto = require('crypto');
 const session = require('express-session');
 const request = require('request');
@@ -216,6 +216,7 @@ app.get('/mypage',(req,res)=>{
 
 //기타?
 app.post('/get_volunteer_data',(req,res)=>{
+    console.log("봉사데이터 가져옴");
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
     url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
