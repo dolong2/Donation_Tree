@@ -92,7 +92,10 @@ app.get('/volunteerTier',(req,res)=>{
     if(req.session.userid&&req.session.username){
         conn.query("select volunteer_hour from tree_user where id=?",[req.session.userid],(err,result)=>{
             var tier;
-            if(result[0].volunteer_hour<=3){
+            if(result[0].volunteer_hour==0){
+                tier="unrank";
+            }
+            else if(result[0].volunteer_hour<=3){
             tier="bronze4";
             }
             else if(result[0].volunteer_hour<=5){
@@ -214,9 +217,7 @@ app.get('/mypage',(req,res)=>{
     });
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
 
-//기타?
-app.post('/get_volunteer_data',(req,res)=>{
-    console.log("봉사데이터 가져옴");
+setTimeout(()=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
     url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
@@ -227,32 +228,52 @@ app.post('/get_volunteer_data',(req,res)=>{
     },(err,ress,body)=>{
         result=body;
         result=convert.xml2json(result, {compact: true, spaces: 4,strict: false});
-        var json=JSON.parse(result).response.body
+        var json=JSON.parse(result).response.body;
         for(let a of json.items.item){
             conn.query('select * from volunteer_list where volunteer_id=?',[a.progrmRegistNo._text],(err,result)=>{
                 if(result.length==0){
                     conn.query('insert into volunteer_list value(?,?,?,?,?)',[a.progrmRegistNo._text,a.progrmSj._text,a.nanmmbyNm._text,a.progrmBgnde._text,a.progrmEndde._text]);
                 }
             });
-        } 
-        res.send(json.items.item);
-    });
-});//저작자: 행정 안전부
-app.post('/clear_volunteer_list',(req,res)=>{
+        }
+    });//봉사를 가져옴
+
     var date=new Date(),str;
     var year=date.getFullYear();
     var month=date.getMonth()<10?("0"+(date.getMonth()+1)):String(date.getMonth()+1);
     var day=date.getDate()<10?("0"+(date.getDate())):String(date.getDate());
     str=Number(year+month+day);
     console.log(str);
-    conn.query('delete from volunteer_list where end_date<?',[str],(err,result)=>{
-        if(err){
-            res.send(false);
+    conn.query('delete from volunteer_list where end_date<?',[str]);//기한이 지난 봉사 삭제
+},0);//서버가 켜지면 봉사 정보를 바로 가져옴
+setInterval(()=>{
+    var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
+    url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
+    url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
+    var result;
+    request({
+        url:url,
+        method:"GET"
+    },(err,ress,body)=>{
+        result=body;
+        result=convert.xml2json(result, {compact: true, spaces: 4,strict: false});
+        var json=JSON.parse(result).response.body;
+        for(let a of json.items.item){
+            conn.query('select * from volunteer_list where volunteer_id=?',[a.progrmRegistNo._text],(err,result)=>{
+                if(result.length==0){
+                    conn.query('insert into volunteer_list value(?,?,?,?,?)',[a.progrmRegistNo._text,a.progrmSj._text,a.nanmmbyNm._text,a.progrmBgnde._text,a.progrmEndde._text]);
+                }
+            });
         }
-        else{
-            res.send(true);
-        }
-    });
-});//마감일이 지난 리스트를 삭제
+    });//봉사를 가져옴
+
+    var date=new Date(),str;
+    var year=date.getFullYear();
+    var month=date.getMonth()<10?("0"+(date.getMonth()+1)):String(date.getMonth()+1);
+    var day=date.getDate()<10?("0"+(date.getDate())):String(date.getDate());
+    str=Number(year+month+day);
+    console.log(str);
+    conn.query('delete from volunteer_list where end_date<?',[str]);//기한이 지난 봉사 삭제
+},43200000)//24시간(86400000ms)마다 봉사 데이터를 가져오면서 기한이 지난 봉사 삭제
 
 app.listen(3000, console.log('Server running on Port 3000'));
