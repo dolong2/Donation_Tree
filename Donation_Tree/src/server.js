@@ -32,6 +32,7 @@ app.get('/',(req,res)=>{
 
 //로그인 관련
 app.post('/loginCheck', (req, res) => {
+    console.log(req.session)
    if(req.session.userid&&req.session.username) {
        res.send({"logged":true,"name":req.session.username});
    }
@@ -216,6 +217,39 @@ app.get('/mypage',(req,res)=>{
         });
     });
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
+app.post('/participate',(req,res)=>{
+    var v_id=req.body.volunteer_id;
+    if(req.session.userid){
+        conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[req.session.userid,v_id],(err,result)=>{
+            if(result.length==0){
+                conn.query('insert into participate_volunteer(id,volunteer_id,volunteer_title) value(?,?,?)',[req.session.userid,v_id,req.body.volunteer_name]);
+                res.send({"participate":true});
+            }
+            else{
+                res.send({"participate":false});
+            }
+        });
+    }
+    else{
+        res.send({"participate":false});
+    }
+});//봉사 참가
+app.post('/order',(req,res)=>{
+    if(req.session.userid){
+        conn.query('select * from order where id=? and item=?',[req.session.userid,req.body.item],(err,result)=>{
+            if(result.length==0){
+                conn.query("insert into order(id,item) value(?,?)",[req.session.userid,req.body.item]);
+                res.send({"participate":true});
+            }
+            else{
+                res.send({"participate":false});
+            }
+        });
+    }
+    else{
+        res.send({"participate":false});
+    }
+});
 
 setTimeout(()=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
