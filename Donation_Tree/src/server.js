@@ -5,6 +5,7 @@ const session = require('express-session');
 const request = require('request');
 const path=require('path');
 const convert=require('xml-js');
+//const hostname = '10.120.74.53';
 
 const db_infor=require("../infor/db_infor.json");
 const volunteer_infor=require("../infor/volunteer_infor.json");
@@ -234,22 +235,24 @@ app.post('/participate',(req,res)=>{
         res.send({"participate":false});
     }
 });//봉사 참가
+
 app.post('/order',(req,res)=>{
     if(req.session.userid){
-        conn.query('select * from order where id=? and item=?',[req.session.userid,req.body.item],(err,result)=>{
-            if(result.length==0){
-                conn.query("insert into order(id,item) value(?,?)",[req.session.userid,req.body.item]);
-                res.send({"participate":true});
+        conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
+            if(req.body.fruit<=result[0].fruit){
+                conn.query("insert into product_order(id,item,address) value(?,?,?)",[req.session.userid,req.body.item,req.body.address]);
+                conn.query("update tree_user set fruit = ? where id=?",[result[0].fruit-req.body.fruit,req.session.userid]);
+                res.send({"order":"주문이 완료되었습니다"});  
             }
             else{
-                res.send({"participate":false});
+                res.send({"order":"주문 열매가 부족합니다"});
             }
         });
     }
     else{
-        res.send({"participate":false});
+        res.send({"order":"로그인이 되지 않았습니다"});
     }
-});
+});//포인트로 주문기능
 
 setTimeout(()=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
