@@ -218,9 +218,10 @@ app.get('/volunteer_list',(req,res)=>{
     });
 });//봉사 목록들을 보내줌
 app.get('/mypage',(req,res)=>{
-    conn.query('select volunteer_cnt,volunteer_hour from tree_user where id=?',[req.session.userid],(err,result)=>{
+    conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
         res.send({
             "name":req.session.username,
+            "fruit":result[0].fruit,
             "volunteer_cnt":result[0].volunteer_cnt,
             "volunteer_hour":result[0].volunteer_hour
         });
@@ -279,7 +280,7 @@ app.post('/order',(req,res)=>{
         conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
             if(req.body.fruit<=result[0].fruit){
                 conn.query("insert into product_order(id,item,address) value(?,?,?)",[req.session.userid,req.body.item,req.body.address]);
-                conn.query("update tree_user set fruit = ? where id=?",[result[0].fruit-req.body.fruit,req.session.userid]);
+                conn.query("update tree_user set fruit = fruit-? where id=?",[req.body.fruit,req.session.userid]);
                 res.send({"order":"주문이 완료되었습니다"});  
             }
             else{
