@@ -202,8 +202,16 @@ app.get('/volunteerTier',(req,res)=>{
 });//유저의 트리(티어)를 보여주는 요청
 app.get('/volunteer_list',(req,res)=>{
     var arr=[];
+    var date=new Date(),str;
+    var year=date.getFullYear();
+    var month=date.getMonth()<10?("0"+(date.getMonth()+1)):String(date.getMonth()+1);
+    var day=date.getDate()<10?("0"+(date.getDate())):String(date.getDate());
+    str=Number(year+month+day);
     conn.query('select * from volunteer_list;',[],(err,result)=>{
         for(let i=0;i<result.length;i++){
+            if(result[i].end_date<str){
+                continue;
+            }
             arr.push(result[i]);
         }
         res.send(arr);
@@ -224,18 +232,42 @@ app.post('/participate',(req,res)=>{
         conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[req.session.userid,v_id],(err,result)=>{
             if(result.length==0){
                 conn.query('insert into participate_volunteer(id,volunteer_id,volunteer_title) value(?,?,?)',[req.session.userid,v_id,req.body.volunteer_name]);
-                res.send({"participate":true});
+                res.send({"participate":"참가되었습니다"});
             }
             else{
-                res.send({"participate":false});
+                res.send({"participate":"이미 신청한 봉사 입니다"});
             }
         });
     }
     else{
-        res.send({"participate":false});
+        res.send({"participate":"로그인 되지 않았습니다"});
     }
 });//봉사 참가
 
+//기타
+app.post('/wirtevolunteerdiary',(req,res)=>{
+    var user_id=req.session.userid,v_id=req.body.volunteer_id;
+    var title=req.body.title,content=req.body.content;
+    var b_hour=req.body.begin_hour,e_hour=req.body.end_hour;
+    conn.query('select *from volunteer_diary where id=? and volunteer_id=?',[req.session.userid,req.body.volunteer_id],(err,result)=>{//중복되는 일지 작성인지 검사
+        if(result[0].length==0){
+            conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[user_id,v_id],(err,result)=>{//일지에 작성할려는 봉사가 신청한 봉사인지 
+                if(result[0].length!=0){
+                    conn.query('delete participate_volunteer where id=? amd volunteer_id=?',[user_id,v_id]);//신청봉사 삭제
+                    conn.query('insert into volunteer_diary(id,volunteer_id,title,content,begin_hour,end_hour) value(?,?,?,?,?,?)',[user_id,v_id,title,content,b_hour,e_hour]);//일지 DB에 저장
+                }
+                else{
+                    res.send({"volunteer_diary":"신청하지 않은 봉사입니다"});
+                }
+            });
+            conn.query('insert into volunteer_diary(id,volunteer_id,title,content,begin_hour,end_hour) value(?,?,?,?,?,?)',[user_id,v_id,title,content,b_hour,e_hour]);
+        }
+        else{
+            res.send({"volunteer_diary":"중복 일지 작성임"});
+        }
+
+    });
+});
 app.post('/order',(req,res)=>{
     if(req.session.userid){
         conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
@@ -274,14 +306,6 @@ setTimeout(()=>{
             });
         }
     });//봉사를 가져옴
-
-    var date=new Date(),str;
-    var year=date.getFullYear();
-    var month=date.getMonth()<10?("0"+(date.getMonth()+1)):String(date.getMonth()+1);
-    var day=date.getDate()<10?("0"+(date.getDate())):String(date.getDate());
-    str=Number(year+month+day);
-    console.log(str);
-    conn.query('delete from volunteer_list where end_date<?',[str]);//기한이 지난 봉사 삭제
 },0);//서버가 켜지면 봉사 정보를 바로 가져옴
 setInterval(()=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
