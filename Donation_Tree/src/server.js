@@ -334,14 +334,6 @@ setInterval(()=>{
             });
         }
     });//봉사를 가져옴
-
-    var date=new Date(),str;
-    var year=date.getFullYear();
-    var month=date.getMonth()<10?("0"+(date.getMonth()+1)):String(date.getMonth()+1);
-    var day=date.getDate()<10?("0"+(date.getDate())):String(date.getDate());
-    str=Number(year+month+day);
-    console.log(str);
-    conn.query('delete from volunteer_list where end_date<?',[str]);//기한이 지난 봉사 삭제
 },43200000)//24시간(86400000ms)마다 봉사 데이터를 가져오면서 기한이 지난 봉사 삭제
 
 app.listen(3000, console.log('Server running on Port 3000'));
