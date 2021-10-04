@@ -245,6 +245,21 @@ app.post('/participate',(req,res)=>{
     }
 });//봉사 참가
 
+app.get('/getParticipate',(req,res)=>{
+    var arr=[];
+    conn.query('select * from participate_volunteer where id=?',[req.session.id],(err,result)=>{
+        if(result.length==0){
+            res.send("참가한 봉사가 없습니다");
+        }
+        else{
+            for(var i;i<result.length;i++){
+                arr.push(result[i]);
+            }
+            res.send(arr);
+        }
+    });
+});//참가 목록 조회
+
 //기타
 app.post('/wirtevolunteerdiary',(req,res)=>{
     var user_id=req.session.userid,v_id=req.body.volunteer_id;
