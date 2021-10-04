@@ -89,7 +89,35 @@ app.post('/logout',(req,res)=>{
     res.send({"message":"로그아웃 되셨습니다"});
 });//로그아웃
 
-//봉사 정보관련
+//봉사 관련
+app.get('/mypage',(req,res)=>{
+    conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
+        res.send({
+            "name":req.session.username,
+            "fruit":result[0].fruit,
+            "volunteer_cnt":result[0].volunteer_cnt,
+            "volunteer_hour":result[0].volunteer_hour
+        });
+    });
+});//마이페이지를 구성하는데 필요한 정보를 보내준다
+app.post('/participate',(req,res)=>{
+    var v_id=req.body.volunteer_id;
+    if(req.session.userid){
+        conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[req.session.userid,v_id],(err,result)=>{
+            if(result.length==0){
+                conn.query('insert into participate_volunteer(id,volunteer_id,volunteer_title) value(?,?,?)',[req.session.userid,v_id,req.body.volunteer_name]);
+                res.send({"participate":"참가되었습니다"});
+            }
+            else{
+                res.send({"participate":"이미 신청한 봉사 입니다"});
+            }
+        });
+    }
+    else{
+        res.send({"participate":"로그인 되지 않았습니다"});
+    }
+});//봉사 참가
+
 app.get('/volunteerTier',(req,res)=>{
     if(req.session.userid&&req.session.username){
         conn.query("select volunteer_hour from tree_user where id=?",[req.session.userid],(err,result)=>{
@@ -199,7 +227,7 @@ app.get('/volunteerTier',(req,res)=>{
     else{
         res.send("로그인 먼저하세여");
     }
-});//유저의 트리(티어)를 보여주는 요청
+});//유저의 트리(티어) 조회
 app.get('/volunteer_list',(req,res)=>{
     var arr=[];
     var date=new Date(),str;
@@ -216,43 +244,15 @@ app.get('/volunteer_list',(req,res)=>{
         }
         res.send(arr);
     });
-});//봉사 목록들을 보내줌
-app.get('/mypage',(req,res)=>{
-    conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
-        res.send({
-            "name":req.session.username,
-            "fruit":result[0].fruit,
-            "volunteer_cnt":result[0].volunteer_cnt,
-            "volunteer_hour":result[0].volunteer_hour
-        });
-    });
-});//마이페이지를 구성하는데 필요한 정보를 보내준다
-app.post('/participate',(req,res)=>{
-    var v_id=req.body.volunteer_id;
-    if(req.session.userid){
-        conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[req.session.userid,v_id],(err,result)=>{
-            if(result.length==0){
-                conn.query('insert into participate_volunteer(id,volunteer_id,volunteer_title) value(?,?,?)',[req.session.userid,v_id,req.body.volunteer_name]);
-                res.send({"participate":"참가되었습니다"});
-            }
-            else{
-                res.send({"participate":"이미 신청한 봉사 입니다"});
-            }
-        });
-    }
-    else{
-        res.send({"participate":"로그인 되지 않았습니다"});
-    }
-});//봉사 참가
-
+});//봉사 목록 조회
 app.get('/getParticipate',(req,res)=>{
     var arr=[];
-    conn.query('select * from participate_volunteer where id=?',[req.session.id],(err,result)=>{
+    conn.query('select * from participate_volunteer where id=?',[req.session.userid],(err,result)=>{
         if(result.length==0){
             res.send("참가한 봉사가 없습니다");
         }
         else{
-            for(var i;i<result.length;i++){
+            for(var i=0;i<result.length;i++){
                 arr.push(result[i]);
             }
             res.send(arr);
