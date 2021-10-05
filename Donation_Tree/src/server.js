@@ -90,16 +90,6 @@ app.post('/logout',(req,res)=>{
 });//로그아웃
 
 //봉사 관련
-app.get('/mypage',(req,res)=>{
-    conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
-        res.send({
-            "name":req.session.username,
-            "fruit":result[0].fruit,
-            "volunteer_cnt":result[0].volunteer_cnt,
-            "volunteer_hour":result[0].volunteer_hour
-        });
-    });
-});//마이페이지를 구성하는데 필요한 정보를 보내준다
 app.post('/participate',(req,res)=>{
     var v_id=req.body.volunteer_id;
     if(req.session.userid){
@@ -117,6 +107,35 @@ app.post('/participate',(req,res)=>{
         res.send({"participate":"로그인 되지 않았습니다"});
     }
 });//봉사 참가
+app.post('/wirtevolunteerdiary',(req,res)=>{
+    var user_id=req.session.userid,v_id=req.body.volunteer_id;
+    var title=req.body.title,content=req.body.content;
+    var b_hour=req.body.begin_hour,e_hour=req.body.end_hour;
+    if(req.session.userid){
+        conn.query('select *from volunteer_diary where id=? and volunteer_id=?',[req.session.userid,req.body.volunteer_id],(err,result)=>{//중복되는 일지 작성인지 검사
+            if(result.length==0){
+                conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[user_id,v_id],(err,result)=>{//일지에 작성할려는 봉사가 신청한 봉사인지 
+                    if(result.length!=0){
+                        conn.query('delete from participate_volunteer where id=? and volunteer_id=?',[user_id,v_id]);//신청봉사 삭제
+                        conn.query('insert into volunteer_diary(id,volunteer_id,title,content,begin_hour,end_hour) value(?,?,?,?,?,?)',[user_id,v_id,title,content,b_hour,e_hour]);//일지 DB에 저장
+                        conn.query('update tree_user set volunteer_cnt=volunteer_cnt+1,volunteer_hour=volunteer_hour+?,fruit=fruit+? where id=?',[e_hour-b_hour,e_hour-b_hour,user_id]);
+                        res.send({"volunteer_diary":"작성완료 되었습니다"});
+                    }
+                    else{
+                        res.send({"volunteer_diary":"신청하지 않은 봉사입니다"});
+                    }
+                });
+            }
+            else{
+                res.send({"volunteer_diary":"중복 일지 작성입니다"});
+            }
+
+        });
+    }
+    else{
+        res.send({"volunteer_diary":"로그인 먼저 해주세요"})
+    }
+});//봉사 일지 작성
 
 app.get('/volunteerTier',(req,res)=>{
     if(req.session.userid&&req.session.username){
@@ -261,35 +280,16 @@ app.get('/getParticipate',(req,res)=>{
 });//봉사 참가 목록 조회
 
 //기타
-app.post('/wirtevolunteerdiary',(req,res)=>{
-    var user_id=req.session.userid,v_id=req.body.volunteer_id;
-    var title=req.body.title,content=req.body.content;
-    var b_hour=req.body.begin_hour,e_hour=req.body.end_hour;
-    if(req.session.userid){
-        conn.query('select *from volunteer_diary where id=? and volunteer_id=?',[req.session.userid,req.body.volunteer_id],(err,result)=>{//중복되는 일지 작성인지 검사
-            if(result.length==0){
-                conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[user_id,v_id],(err,result)=>{//일지에 작성할려는 봉사가 신청한 봉사인지 
-                    if(result.length!=0){
-                        conn.query('delete from participate_volunteer where id=? and volunteer_id=?',[user_id,v_id]);//신청봉사 삭제
-                        conn.query('insert into volunteer_diary(id,volunteer_id,title,content,begin_hour,end_hour) value(?,?,?,?,?,?)',[user_id,v_id,title,content,b_hour,e_hour]);//일지 DB에 저장
-                        conn.query('update tree_user set volunteer_cnt=volunteer_cnt+1,volunteer_hour=volunteer_hour+?,fruit=fruit+? where id=?',[e_hour-b_hour,e_hour-b_hour,user_id]);
-                        res.send({"volunteer_diary":"작성완료 되었습니다"});
-                    }
-                    else{
-                        res.send({"volunteer_diary":"신청하지 않은 봉사입니다"});
-                    }
-                });
-            }
-            else{
-                res.send({"volunteer_diary":"중복 일지 작성임"});
-            }
-
+app.get('/mypage',(req,res)=>{
+    conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
+        res.send({
+            "name":req.session.username,
+            "fruit":result[0].fruit,
+            "volunteer_cnt":result[0].volunteer_cnt,
+            "volunteer_hour":result[0].volunteer_hour
         });
-    }
-    else{
-        res.send({"volunteer_diary":"로그인 먼저 해주세요"})
-    }
-});//봉사 일지 작성
+    });
+});//마이페이지를 구성하는데 필요한 정보를 보내준다
 app.post('/order',(req,res)=>{
     if(req.session.userid){
         conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
@@ -309,13 +309,27 @@ app.post('/order',(req,res)=>{
 });//포인트로 주문기능
 app.get('/ranking',(req,res)=>{
     var arr=[];
-    conn.query('select * from tree_user order by volunteer_hour asc',[],(err,result)=>{
+    conn.query('select * from tree_user order by volunteer_hour desc',[],(err,result)=>{
         for(let i=0;i<result.length;i++){
             arr.push({"name":result[i].name,"volunteer_hour":result[i].volunteer_hour,"volunteer_cnt":result[i].volunteer_cnt});
         }
+        res.send(arr);
     });
-    res.send(arr);
 });//랭킹
+app.get('/myranking',(req,res)=>{
+    if(req.session.userid){
+        conn.query('select * from tree_user order by volunteer_hour desc',[],(err,result)=>{
+            for(let i=0;i<result.length;i++){
+                if(result[i].id==req.session.userid){
+                    res.send({"rank":i+1,"name":result[i].name,"volunteer_hour":result[i].volunteer_hour,"volunteer_cnt":result[i].volunteer_cnt});
+                }
+            }
+        });
+    }
+    else{
+        res.send(false);
+    }
+});//나의 순위가 담긴 랭킹
 
 setTimeout(()=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
@@ -361,3 +375,4 @@ setInterval(()=>{
 },43200000)//24시간(86400000ms)마다 봉사 데이터를 가져오면서 기한이 지난 봉사 삭제
 
 app.listen(3000, console.log('Server running on Port 3000'));
+//해야될거: 중간 API점검
