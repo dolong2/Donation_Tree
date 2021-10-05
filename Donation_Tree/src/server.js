@@ -258,7 +258,7 @@ app.get('/getParticipate',(req,res)=>{
             res.send(arr);
         }
     });
-});//참가 목록 조회
+});//봉사 참가 목록 조회
 
 //기타
 app.post('/wirtevolunteerdiary',(req,res)=>{
@@ -289,7 +289,7 @@ app.post('/wirtevolunteerdiary',(req,res)=>{
     else{
         res.send({"volunteer_diary":"로그인 먼저 해주세요"})
     }
-});
+});//봉사 일지 작성
 app.post('/order',(req,res)=>{
     if(req.session.userid){
         conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
@@ -307,6 +307,15 @@ app.post('/order',(req,res)=>{
         res.send({"order":"로그인이 되지 않았습니다"});
     }
 });//포인트로 주문기능
+app.get('/ranking',(req,res)=>{
+    var arr=[];
+    conn.query('select * from tree_user order by volunteer_hour asc',[],(err,result)=>{
+        for(let i=0;i<result.length;i++){
+            arr.push({"name":result[i].name,"volunteer_hour":result[i].volunteer_hour,"volunteer_cnt":result[i].volunteer_cnt});
+        }
+    });
+    res.send(arr);
+});//랭킹
 
 setTimeout(()=>{
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
