@@ -311,7 +311,7 @@ app.get('/ranking',(req,res)=>{
     var arr=[];
     conn.query('select * from tree_user order by volunteer_hour desc',[],(err,result)=>{
         for(let i=0;i<result.length;i++){
-            arr.push({"name":result[i].name,"volunteer_hour":result[i].volunteer_hour,"volunteer_cnt":result[i].volunteer_cnt});
+            arr.push({"rank":i+1,"name":result[i].name,"volunteer_hour":result[i].volunteer_hour,"volunteer_cnt":result[i].volunteer_cnt});
         }
         res.send(arr);
     });
