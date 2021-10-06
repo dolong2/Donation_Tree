@@ -5,7 +5,6 @@ const session = require('express-session');
 const request = require('request');
 const path=require('path');
 const convert=require('xml-js');
-//const hostname = '10.120.74.53';
 
 const db_infor=require("../infor/db_infor.json");
 const volunteer_infor=require("../infor/volunteer_infor.json");
@@ -137,6 +136,7 @@ app.post('/wirtevolunteerdiary',(req,res)=>{
     }
 });//봉사 일지 작성
 
+//조회
 app.get('/volunteerTier',(req,res)=>{
     if(req.session.userid&&req.session.username){
         conn.query("select volunteer_hour from tree_user where id=?",[req.session.userid],(err,result)=>{
@@ -345,7 +345,7 @@ setTimeout(()=>{
         var json=JSON.parse(result).response.body;
         for(let a of json.items.item){
             conn.query('select * from volunteer_list where volunteer_id=?',[a.progrmRegistNo._text],(err,result)=>{
-                if(result.length==0){
+                if(result.length==0){//봉사 ID로 조회하고 조회한 봉사ID가 없으면 새로 DB에 추가
                     conn.query('insert into volunteer_list value(?,?,?,?,?)',[a.progrmRegistNo._text,a.progrmSj._text,a.nanmmbyNm._text,a.progrmBgnde._text,a.progrmEndde._text]);
                 }
             });
@@ -375,4 +375,3 @@ setInterval(()=>{
 },43200000)//24시간(86400000ms)마다 봉사 데이터를 가져오면서 기한이 지난 봉사 삭제
 
 app.listen(3000, console.log('Server running on Port 3000'));
-//해야될거: 중간 API점검
