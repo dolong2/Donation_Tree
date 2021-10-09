@@ -332,6 +332,8 @@ app.get('/myranking',(req,res)=>{
 });//나의 순위가 담긴 랭킹
 
 setTimeout(()=>{
+    var now=new Date();
+    console.log(now.getHours()+":"+now.getMinutes());
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
     url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
@@ -353,6 +355,8 @@ setTimeout(()=>{
     });//봉사를 가져옴
 },0);//서버가 켜지면 봉사 정보를 바로 가져옴
 setInterval(()=>{
+    var now=new Date();
+    console.log(now.getHours()+":"+now.getMinutes());
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
     url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
