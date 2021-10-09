@@ -5,9 +5,11 @@ const session = require('express-session');
 const request = require('request');
 const path=require('path');
 const convert=require('xml-js');
+const nodemailer=require('nodemailer');
 
 const db_infor=require("../infor/db_infor.json");
 const volunteer_infor=require("../infor/volunteer_infor.json");
+const mail_infor=require("../infor/mail_infor.json");
 
 var conn = mysql.createConnection({
     host : db_infor.host,  
@@ -16,7 +18,16 @@ var conn = mysql.createConnection({
     database : db_infor.database
 });
 conn.connect();
-
+let transport=nodemailer.createTransport({
+    service:"gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: mail_infor.user,
+      pass: mail_infor.pass,
+    },
+});
 const app = express();
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
@@ -87,6 +98,31 @@ app.post('/logout',(req,res)=>{
     req.session.destroy(error=>{if(error)console.log(error);})
     res.send({"message":"로그아웃 되셨습니다"});
 });//로그아웃
+app.post('/user/find/Id',(req,res)=>{
+    conn.query("select * from tree_user where name=?",[req.body.name],(err,result)=>{
+        if(result.length==0){
+            res.send({"result":"등록된 이름이 없습니다"});
+        }
+        conn.query("select * from tree_user where mail=? and name=?",[req.body.mail,req.body.name],(err,result)=>{
+            if(result.length==0){
+                res.send({"result":"메일이 일치하지 않습니다"});
+            }
+            else{
+                find_id(result,req.body.mail);
+                res.send({"result":"메일이 전송되었습니다"});
+            }
+        });
+    });
+});//ID 찾기
+async function find_id(result,mail){
+    let infor= await transport.sendMail({
+        from:`"Voluntree_team"<${mail_infor.user}>`,
+        to:mail,
+        subject:"voluntree ID 찾기",
+        text:result[0].id,
+        html: `<b>아이디:${result[0].id}</b>`,
+    });
+}//ID찾는 함수
 
 //봉사 관련
 app.post('/participate',(req,res)=>{
