@@ -83,7 +83,7 @@ app.post('/register',(req,res)=>{
         crypto.pbkdf2(req.body.password, buf.toString('base64'), 100000, 64, 'sha512', (err, key) => {
           console.log(key.toString('base64'));
           var pass=key.toString('base64'),salt=buf.toString('base64');
-          conn.query('insert into tree_user(id,password,name,salt) values(?,?,?,?)',[req.body.id,pass,req.body.name,salt],(err,result)=>{
+          conn.query('insert into tree_user(id,password,name,mail,salt) values(?,?,?,?,?)',[req.body.id,pass,req.body.name,req.body.mail,salt],(err,result)=>{
               if(err){
                   res.send({"complete":false});
               }
@@ -122,7 +122,7 @@ async function find_id(result,mail){
         text:result[0].id,
         html: `<b>아이디:${result[0].id}</b>`,
     });
-}//ID찾는 함수
+}//ID찾기 위한 메일보내는 함수
 
 //봉사 관련
 app.post('/participate',(req,res)=>{
