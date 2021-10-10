@@ -123,6 +123,16 @@ async function find_id(result,mail){
         html: `<b>아이디:${result[0].id}</b>`,
     });
 }//ID찾기 위한 메일보내는 함수
+app.post('/user/change/Password/auth',(req,res)=>{
+    conn.query("select * from tree_user where id=? and mail=?",[req.body.id,req.body.mail],(err,result)=>{
+        if(result.length==0){
+            res.send({"result":false});
+        }
+        else{
+            res.send({"result":true});
+        }
+    })
+});
 
 //봉사 관련
 app.post('/participate',(req,res)=>{
