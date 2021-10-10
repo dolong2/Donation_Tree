@@ -81,7 +81,6 @@ app.post('/login',(req,res)=>{
 app.post('/register',(req,res)=>{
     crypto.randomBytes(64, (err, buf) => {
         crypto.pbkdf2(req.body.password, buf.toString('base64'), 100000, 64, 'sha512', (err, key) => {
-          console.log(key.toString('base64'));
           var pass=key.toString('base64'),salt=buf.toString('base64');
           conn.query('insert into tree_user(id,password,name,mail,salt) values(?,?,?,?,?)',[req.body.id,pass,req.body.name,req.body.mail,salt],(err,result)=>{
               if(err){
@@ -132,7 +131,16 @@ app.post('/user/change/Password/auth',(req,res)=>{
             res.send({"result":true});
         }
     })
-});
+});//비번찾기위한 사용자 인증
+app.post('/user/change/Password',(req,res)=>{
+    conn.query("select * from tree_user where id=?",[req.body.id],(err,result)=>{
+        crypto.pbkdf2(req.body.password,result[0].salt, 100000, 64, 'sha512',(err,key)=>{
+            var password=key.toString('base64');
+            conn.query("update tree_user set password=? where id=?",[password,req.body.id]);
+            res.send({"result":"변경 되었습니다"});
+        });
+    });
+});//비밀번호 바꾸기
 
 //봉사 관련
 app.post('/participate',(req,res)=>{
