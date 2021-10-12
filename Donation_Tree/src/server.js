@@ -199,100 +199,100 @@ app.get('/volunteerTier',(req,res)=>{
                 tier="unrank";
             }
             else if(result[0].volunteer_hour<=3){
-            tier="bronze4";
+            tier="../src/public/img/단풍/씨앗";
             }
             else if(result[0].volunteer_hour<=5){
-                tier="bronze3";
+                tier="../src/public/img/단풍/새싹";
             }
             else if(result[0].volunteer_hour<=7){
-                tier="bronze2";
+                tier="../src/public/img/단풍/줄기";
             }
             else if(result[0].volunteer_hour<=9){
-                tier="bronze1";
+                tier="../src/public/img/단풍/나무";
             }
             else if(result[0].volunteer_hour<=11){
-                tier="silver4";
+                tier="../src/public/img/대나무/씨앗";
             }
             else if(result[0].volunteer_hour<=14){
-                tier="silver3";
+                tier="../src/public/img/대나무/새싹";
             }
             else if(result[0].volunteer_hour<=17){
-                tier="silver2";
+                tier="../src/public/img/대나무/줄기";
             }
             else if(result[0].volunteer_hour<=20){
-                tier="silver1";
+                tier="../src/public/img/대나무/나무";
             }
             else if(result[0].volunteer_hour<=24){
-                tier="gold4";
+                tier="../src/public/img/바오밥/씨앗";
             }
             else if(result[0].volunteer_hour<=28){
-                tier="gold3";
+                tier="../src/public/img/바오밥/새싹";
             }
             else if(result[0].volunteer_hour<=32){
-                tier="gold2";
+                tier="../src/public/img/바오밥/줄기";
             }
             else if(result[0].volunteer_hour<=36){
-                tier="gold1";
+                tier="../src/public/img/바오밥/나무";
             }
             else if(result[0].volunteer_hour<=41){
-                tier="platinum4";
+                tier="../src/public/img/벚꽃/씨앗";
             }
             else if(result[0].volunteer_hour<=46){
-                tier="platinum3";
+                tier="../src/public/img/벚꽃/새싹";
             }
             else if(result[0].volunteer_hour<=51){
-                tier="platinum2";
+                tier="../src/public/img/벚꽃/줄기";
             }
             else if(result[0].volunteer_hour<=56){
-                tier="platinum1";
+                tier="../src/public/img/벚꽃/나무";
             }
             else if(result[0].volunteer_hour<=62){
-                tier="diamond4";
+                tier="../src/public/img/소나무/씨앗";
             }
             else if(result[0].volunteer_hour<=68){
-                tier="diamond3";
+                tier="../src/public/img/소나무/새싹";
             }
             else if(result[0].volunteer_hour<=74){
-                tier="diamond2";
+                tier="../src/public/img/소나무/줄기";
             }
             else if(result[0].volunteer_hour<=80){
-                tier="diamond1";
+                tier="../src/public/img/소나무/나무";
             }
             else if(result[0].volunteer_hour<=87){
-                tier="master4";
+                tier="../src/public/img/야자/씨앗";
             }
             else if(result[0].volunteer_hour<=94){
-                tier="master3";
+                tier="../src/public/img/야자/새싹";
             }
             else if(result[0].volunteer_hour<=101){
-                tier="master2";
+                tier="../src/public/img/야자/줄기";
             }
             else if(result[0].volunteer_hour<=108){
-                tier="master1";
+                tier="../src/public/img/야자/나무";
             }
             else if(result[0].volunteer_hour<=116){
-                tier="grandmaster4";
+                tier="../src/public/img/은행/씨앗";
             }
             else if(result[0].volunteer_hour<=124){
-                tier="grandmaster3";
+                tier="../src/public/img/은행/새싹";
             }
             else if(result[0].volunteer_hour<=132){
-                tier="grandmaster2";
+                tier="../src/public/img/은행/줄기";
             }
             else if(result[0].volunteer_hour<=140){
-                tier="grandmaster1";
+                tier="../src/public/img/은행/나무";
             }
             else if(result[0].volunteer_hour<=149){
-                tier="challenger4";
+                tier="../src/public/img/플라타너스/씨앗";
             }
             else if(result[0].volunteer_hour<=158){
-                tier="challenger3";
+                tier="../src/public/img/플라타너스/새싹";
             }
             else if(result[0].volunteer_hour<=167){
-                tier="challenger2";
+                tier="../src/public/img/플라타너스/줄기";
             }
             else {
-                tier="challenger1";
+                tier="../src/public/img/플라타너스/나무";
             }
             res.send({"tree_tier":tier});
         });
