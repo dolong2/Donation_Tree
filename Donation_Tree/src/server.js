@@ -132,7 +132,7 @@ app.post('/user/change/Password/auth',(req,res)=>{
         }
     })
 });//비번찾기위한 사용자 인증
-app.post('/user/change/Password',(req,res)=>{
+app.put('/user/change/Password',(req,res)=>{
     conn.query("select * from tree_user where id=?",[req.body.id],(err,result)=>{
         crypto.pbkdf2(req.body.password,result[0].salt, 100000, 64, 'sha512',(err,key)=>{
             var password=key.toString('base64');
@@ -143,7 +143,7 @@ app.post('/user/change/Password',(req,res)=>{
 });//비밀번호 바꾸기
 
 //봉사 관련
-app.post('/participate',(req,res)=>{
+app.put('/participate',(req,res)=>{
     var v_id=req.body.volunteer_id;
     if(req.session.userid){
         conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[req.session.userid,v_id],(err,result)=>{
@@ -160,7 +160,7 @@ app.post('/participate',(req,res)=>{
         res.send({"participate":"로그인 되지 않았습니다"});
     }
 });//봉사 참가
-app.post('/wirtevolunteerdiary',(req,res)=>{
+app.put('/wirtevolunteerdiary',(req,res)=>{
     var user_id=req.session.userid,v_id=req.body.volunteer_id;
     var title=req.body.title,content=req.body.content;
     var b_hour=req.body.begin_hour,e_hour=req.body.end_hour;
@@ -344,7 +344,7 @@ app.get('/mypage',(req,res)=>{
         });
     });
 });//마이페이지를 구성하는데 필요한 정보를 보내준다
-app.post('/order',(req,res)=>{
+app.put('/order',(req,res)=>{
     if(req.session.userid){
         conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
             if(req.body.fruit<=result[0].fruit){
