@@ -334,16 +334,6 @@ app.get('/getParticipate',(req,res)=>{
 });//봉사 참가 목록 조회
 
 //기타
-app.get('/mypage',(req,res)=>{
-    conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
-        res.send({
-            "name":req.session.username,
-            "fruit":result[0].fruit,
-            "volunteer_cnt":result[0].volunteer_cnt,
-            "volunteer_hour":result[0].volunteer_hour
-        });
-    });
-});//마이페이지를 구성하는데 필요한 정보를 보내준다
 app.put('/order',(req,res)=>{
     if(req.session.userid){
         conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
@@ -361,6 +351,16 @@ app.put('/order',(req,res)=>{
         res.send({"order":"로그인이 되지 않았습니다"});
     }
 });//포인트로 주문기능
+app.get('/mypage',(req,res)=>{
+    conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
+        res.send({
+            "name":req.session.username,
+            "fruit":result[0].fruit,
+            "volunteer_cnt":result[0].volunteer_cnt,
+            "volunteer_hour":result[0].volunteer_hour
+        });
+    });
+});//마이페이지를 구성하는데 필요한 정보를 보내준다
 app.get('/ranking',(req,res)=>{
     var arr=[];
     conn.query('select * from tree_user order by volunteer_hour desc',[],(err,result)=>{
@@ -370,7 +370,7 @@ app.get('/ranking',(req,res)=>{
         res.send(arr);
     });
 });//랭킹
-app.get('/myranking',(req,res)=>{
+app.get('/ranking/my',(req,res)=>{
     if(req.session.userid){
         conn.query('select * from tree_user order by volunteer_hour desc',[],(err,result)=>{
             for(let i=0;i<result.length;i++){
