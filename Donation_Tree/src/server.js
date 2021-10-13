@@ -334,7 +334,7 @@ app.get('/getParticipate',(req,res)=>{
 });//봉사 참가 목록 조회
 
 //기타
-app.put('/order',(req,res)=>{
+app.post('/order',(req,res)=>{
     if(req.session.userid){
         conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
             if(req.body.fruit<=result[0].fruit){
