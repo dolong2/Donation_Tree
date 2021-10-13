@@ -385,6 +385,49 @@ app.get('/ranking/my',(req,res)=>{
     }
 });//나의 순위가 담긴 랭킹
 
+//쇼핑
+app.get('/shop/energy',(req,res)=>{
+    var arr={};
+    conn.query("select * from product where type='energy'",[],(err,result)=>{
+        for(let i=0;i<result.length;i++){
+            arr.push({"name":result[i].name,"fruit":result[i].fruit,"img":result[i].img});
+        }
+        res.send(arr);
+    });
+});//에너지 상품만 조회
+app.get('/shop/enviroment',(req,res)=>{
+    var arr={};
+    conn.query("select * from product where type='enviroment'",[],(err,result)=>{
+        for(let i=0;i<result.length;i++){
+            arr.push({"name":result[i].name,"fruit":result[i].fruit,"img":result[i].img});
+        }
+        res.send(arr);
+    });
+});//친환경 상품만 조회
+app.get('/shop',(req,res)=>{
+    var arr={};
+    conn.query("select * from product",[],(err,result)=>{
+        for(let i=0;i<result.length;i++){
+            arr.push({"name":result[i].name,"fruit":result[i].fruit,"img":result[i].img});
+        }
+        res.send(arr);
+    });
+});//모든 상품 조회
+app.post('/shop/insert',(req,res)=>{
+    var name=req.body.name;
+    var fruit=req.body.fruit;
+    var type=req.body.type;
+    var img=req.body.img;
+    conn.query("insert into product(name,fruit,type,img) value(?,?,?,?)",[name,fruit,type,img],(err,result)=>{
+      if(err){
+        res.send({"product":false});
+      }  
+      else{
+        res.send({"product":true});
+      }
+    });
+});//상품 추가
+
 setTimeout(()=>{
     var now=new Date();
     console.log(now.getHours()+":"+now.getMinutes());
