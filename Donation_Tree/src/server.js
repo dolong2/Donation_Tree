@@ -337,14 +337,17 @@ app.get('/getParticipate',(req,res)=>{
 app.post('/order',(req,res)=>{
     if(req.session.userid){
         conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
-            if(req.body.fruit<=result[0].fruit){
-                conn.query("insert into product_order(id,item,address) value(?,?,?)",[req.session.userid,req.body.item,req.body.address]);
-                conn.query("update tree_user set fruit = fruit-? where id=?",[req.body.fruit,req.session.userid]);
-                res.send({"order":"주문이 완료되었습니다"});  
-            }
-            else{
-                res.send({"order":"주문 열매가 부족합니다"});
-            }
+            var user=result[0];
+            conn.query('select * from product where name=?',[req.body.item_name],(err,result)=>{
+                if(result[0].fruit<=user.fruit){
+                    conn.query("insert into product_order(id,item,address) value(?,?,?)",[req.session.userid,result[0].name,req.body.address]);
+                    conn.query("update tree_user set fruit = fruit-? where id=?",[result[0].fruit,req.session.userid]);
+                    res.send({"order":"주문이 완료되었습니다"});  
+                }
+                else{
+                    res.send({"order":"주문하기위한 열매가 부족합니다"});
+                }
+            });
         });
     }
     else{
@@ -387,8 +390,8 @@ app.get('/ranking/my',(req,res)=>{
 
 //쇼핑
 app.get('/shop/energy',(req,res)=>{
-    var arr={};
-    conn.query("select * from product where type='energy'",[],(err,result)=>{
+    var arr=[];
+    conn.query("select * from product where type='에너지'",[],(err,result)=>{
         for(let i=0;i<result.length;i++){
             arr.push({"name":result[i].name,"fruit":result[i].fruit,"img":result[i].img});
         }
@@ -396,8 +399,8 @@ app.get('/shop/energy',(req,res)=>{
     });
 });//에너지 상품만 조회
 app.get('/shop/enviroment',(req,res)=>{
-    var arr={};
-    conn.query("select * from product where type='enviroment'",[],(err,result)=>{
+    var arr=[];
+    conn.query("select * from product where type='친환경'",[],(err,result)=>{
         for(let i=0;i<result.length;i++){
             arr.push({"name":result[i].name,"fruit":result[i].fruit,"img":result[i].img});
         }
@@ -405,7 +408,7 @@ app.get('/shop/enviroment',(req,res)=>{
     });
 });//친환경 상품만 조회
 app.get('/shop',(req,res)=>{
-    var arr={};
+    var arr=[];
     conn.query("select * from product",[],(err,result)=>{
         for(let i=0;i<result.length;i++){
             arr.push({"name":result[i].name,"fruit":result[i].fruit,"img":result[i].img});
@@ -418,8 +421,10 @@ app.post('/shop/insert',(req,res)=>{
     var fruit=req.body.fruit;
     var type=req.body.type;
     var img=req.body.img;
-    conn.query("insert into product(name,fruit,type,img) value(?,?,?,?)",[name,fruit,type,img],(err,result)=>{
+    var description=req.body.description;
+    conn.query("insert into product(name,fruit,type,img,description) value(?,?,?,?,?)",[name,fruit,type,img,description],(err,result)=>{
       if(err){
+        console.log(err);
         res.send({"product":false});
       }  
       else{
