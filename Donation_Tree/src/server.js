@@ -334,26 +334,6 @@ app.get('/getParticipate',(req,res)=>{
 });//봉사 참가 목록 조회
 
 //기타
-app.post('/order',(req,res)=>{
-    if(req.session.userid){
-        conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
-            var user=result[0];
-            conn.query('select * from product where name=?',[req.body.item_name],(err,result)=>{
-                if(result[0].fruit<=user.fruit){
-                    conn.query("insert into product_order(id,item,address) value(?,?,?)",[req.session.userid,result[0].name,req.body.address]);
-                    conn.query("update tree_user set fruit = fruit-? where id=?",[result[0].fruit,req.session.userid]);
-                    res.send({"order":"주문이 완료되었습니다"});  
-                }
-                else{
-                    res.send({"order":"주문하기위한 열매가 부족합니다"});
-                }
-            });
-        });
-    }
-    else{
-        res.send({"order":"로그인이 되지 않았습니다"});
-    }
-});//포인트로 주문기능
 app.get('/mypage',(req,res)=>{
     conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
         res.send({
@@ -387,6 +367,47 @@ app.get('/ranking/my',(req,res)=>{
         res.send(false);
     }
 });//나의 순위가 담긴 랭킹
+app.get('/tree/count',(req,res)=>{
+    conn.query('select count(*) as count from tree_user',[],(err,result)=>{
+        res.send({"result":result[0].count});
+    });
+});//트리의 수
+
+//상품 주문
+app.post('/order',(req,res)=>{
+    if(req.session.userid){
+        conn.query('select * from tree_user where id=?',[req.session.userid],(err,result)=>{
+            var user=result[0];
+            conn.query('select * from product where name=?',[req.body.item_name],(err,result)=>{
+                if(result[0].fruit<=user.fruit){
+                    conn.query("insert into product_order(id,item,address) value(?,?,?)",[req.session.userid,result[0].name,req.body.address]);
+                    conn.query("update tree_user set fruit = fruit-? where id=?",[result[0].fruit,req.session.userid]);
+                    res.send({"order":"주문이 완료되었습니다"});  
+                }
+                else{
+                    res.send({"order":"주문하기위한 열매가 부족합니다"});
+                }
+            });
+        });
+    }
+    else{
+        res.send({"order":"로그인이 되지 않았습니다"});
+    }
+});//포인트로 주문기능
+app.get('/order/my',(req,res)=>{
+    var arr=[];
+    if(req.session.userid){
+        conn.query('select * from product_order where id=?',[req.session.userid],(err,result)=>{
+            for(let i=0;i<result.length;i++){
+                arr.push({"item_name":result[i].item,"address":result[i].address,"status":result[i].status});
+            }
+            res.send(arr);
+        });
+    }
+    else{
+        res.send(arr);
+    }
+});//내가 했던 주문 조회
 
 //쇼핑
 app.get('/shop/energy',(req,res)=>{
@@ -416,6 +437,11 @@ app.get('/shop',(req,res)=>{
         res.send(arr);
     });
 });//모든 상품 조회
+app.get('/shop/about',(req,res)=>{
+    conn.query('select * from product where name=?',[req.body.product_name],(err,result)=>{
+        res.send({"name":result[0].name,"fruit":result[0].fruit,"img":result[0].img,"description":result[0].description});
+    });
+});//상품 상세설명
 app.post('/shop/insert',(req,res)=>{
     var name=req.body.name;
     var fruit=req.body.fruit;
