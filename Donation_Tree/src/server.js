@@ -191,7 +191,7 @@ app.put('/wirtevolunteerdiary',(req,res)=>{
 });//봉사 일지 작성
 
 //조회
-app.get('/volunteerTier',(req,res)=>{
+app.get('/volunteer/Tier',(req,res)=>{
     if(req.session.userid&&req.session.username){
         conn.query("select volunteer_hour from tree_user where id=?",[req.session.userid],(err,result)=>{
             var tier;
@@ -301,7 +301,7 @@ app.get('/volunteerTier',(req,res)=>{
         res.send("로그인 먼저하세여");
     }
 });//유저의 트리(티어) 조회
-app.get('/volunteer_list',(req,res)=>{
+app.get('/voluntee/list',(req,res)=>{
     var arr=[];
     var date=new Date(),str;
     var year=date.getFullYear();
@@ -318,7 +318,7 @@ app.get('/volunteer_list',(req,res)=>{
         res.send(arr);
     });
 });//봉사 목록 조회
-app.get('/getParticipate',(req,res)=>{
+app.get('/Participate',(req,res)=>{
     var arr=[];
     conn.query('select * from participate_volunteer where id=?',[req.session.userid],(err,result)=>{
         if(result.length==0){
