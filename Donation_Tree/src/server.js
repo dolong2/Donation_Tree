@@ -203,6 +203,25 @@ app.get('/volunteer/diary/all',(req,res)=>{
         res.send("로그인 먼저 해주세요");
     }
 });//모든 자신의 봉사일지 가져오기
+app.get('/volunteer/diary/details',(req,res)=>{
+    if(req.session.userid){
+        conn.query("select * from volunteer_diary where id=? and volunteer_id=?",[req.session.userid,req.body.volunteer_id],(err,result)=>{
+            if(result.length==0){
+                res.send({"result":"조회된 일지가 없습니다"});
+            }
+            else{
+                var rs=result;
+                conn.query("select name from tree_user where id=?",[result[0].id],(err,result)=>{
+                    var user_name=result[0].name;
+                    res.send({"result":{"author":user_name,"volunteer_id":rs[0].volunteer_id,"title":rs[0].title,"content":rs[0].content,"begin_hour":rs[0].begin_hour,"end_hour":rs[0].end_hour}});
+                });
+            }
+        });
+    }
+    else{
+        res.send({"result":"로그인 먼저 해주세요"});
+    }
+});//봉사 일지 상세보기
 
 //조회
 app.get('/volunteer/Tier',(req,res)=>{
