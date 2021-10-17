@@ -97,6 +97,8 @@ app.post('/logout',(req,res)=>{
     req.session.destroy(error=>{if(error)console.log(error);})
     res.send({"message":"로그아웃 되셨습니다"});
 });//로그아웃
+
+//계정 복구
 app.post('/user/find/Id',(req,res)=>{
     conn.query("select * from tree_user where name=?",[req.body.name],(err,result)=>{
         if(result.length==0){
@@ -334,14 +336,14 @@ app.get('/volunteer/Tier',(req,res)=>{
         res.send("로그인 먼저하세여");
     }
 });//유저의 트리(티어) 조회
-app.get('/voluntee/list',(req,res)=>{
+app.get('/volunteer/list',(req,res)=>{
     var arr=[];
     var date=new Date(),str;
     var year=date.getFullYear();
-    var month=date.getMonth()<10?("0"+(date.getMonth()+1)):String(date.getMonth()+1);
+    var month=date.getMonth()+1<10?("0"+(date.getMonth()+1)):String(date.getMonth()+1);
     var day=date.getDate()<10?("0"+(date.getDate())):String(date.getDate());
     str=Number(year+month+day);
-    conn.query('select * from volunteer_list;',[],(err,result)=>{
+    conn.query('select * from volunteer_list',[],(err,result)=>{
         for(let i=0;i<result.length;i++){
             if(result[i].end_date<str){
                 continue;
