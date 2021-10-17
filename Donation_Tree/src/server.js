@@ -143,7 +143,7 @@ app.put('/user/change/Password',(req,res)=>{
 });//비밀번호 바꾸기
 
 //봉사 관련
-app.put('/participate',(req,res)=>{
+app.post('/volunteer/participate',(req,res)=>{
     var v_id=req.body.volunteer_id;
     if(req.session.userid){
         conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[req.session.userid,v_id],(err,result)=>{
@@ -159,8 +159,8 @@ app.put('/participate',(req,res)=>{
     else{
         res.send({"participate":"로그인 되지 않았습니다"});
     }
-});//봉사 참가
-app.put('/wirtevolunteerdiary',(req,res)=>{
+});//봉사 신청
+app.post('/volunteer/diary',(req,res)=>{
     var user_id=req.session.userid,v_id=req.body.volunteer_id;
     var title=req.body.title,content=req.body.content;
     var b_hour=req.body.begin_hour,e_hour=req.body.end_hour;
@@ -189,6 +189,20 @@ app.put('/wirtevolunteerdiary',(req,res)=>{
         res.send({"volunteer_diary":"로그인 먼저 해주세요"})
     }
 });//봉사 일지 작성
+app.get('/volunteer/diary/all',(req,res)=>{
+    if(req.session.userid){
+        conn.query("select * from volunteer_diary where id=?",[req.session.userid],(err,result)=>{
+            var arr=[];
+            for(let i=0;i<result.length;i++){
+                arr.push({"num":i+1,"title":result[i].title,"content":result[i].content,"volunteer_id":result[i].volunteer_id});
+            }
+            res.send(arr);
+        });    
+    }
+    else{
+        res.send("로그인 먼저 해주세요");
+    }
+});//모든 자신의 봉사일지 가져오기
 
 //조회
 app.get('/volunteer/Tier',(req,res)=>{
