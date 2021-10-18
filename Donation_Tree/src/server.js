@@ -97,6 +97,28 @@ app.post('/logout',(req,res)=>{
     res.send({"message":"로그아웃 되셨습니다"});
 });//로그아웃
 
+//중복확인
+app.post('/register/duplicate/id',(req,res)=>{
+    conn.query("select * from tree_user where id=?",[req.body.id],(err,result)=>{
+        if(result.length==0){
+            res.send({"result":true});
+        }
+        else{
+            res.send({"result":false});
+        }
+    });
+});//id중복확인
+app.post('/register/duplicate/mail',(req,res)=>{
+    conn.query("select * from tree_user where mail=?",[req.body.mails],(err,result)=>{
+        if(result.length==0){
+            res.send({"result":true});
+        }
+        else{
+            res.send({"result":false});
+        }
+    });
+});//mail중복확인
+
 //계정 복구
 app.post('/user/find/Id',(req,res)=>{
     conn.query("select * from tree_user where name=?",[req.body.name],(err,result)=>{
