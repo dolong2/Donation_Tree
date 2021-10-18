@@ -43,7 +43,6 @@ app.get('/',(req,res)=>{
 
 //로그인 관련
 app.post('/loginCheck', (req, res) => {
-    console.log(req.session)
    if(req.session.userid&&req.session.username) {
        res.send({"logged":true,"name":req.session.username});
    }
@@ -352,8 +351,8 @@ app.get('/volunteer/list',(req,res)=>{
         }
         res.send(arr);
     });
-});//봉사 목록 조회
-app.get('/Participate',(req,res)=>{
+});//모든봉사 목록 조회
+app.get('/volunteer/Participate',(req,res)=>{
     var arr=[];
     conn.query('select * from participate_volunteer where id=?',[req.session.userid],(err,result)=>{
         if(result.length==0){
@@ -542,3 +541,7 @@ setInterval(()=>{
 },43200000)//24시간(86400000ms)마다 봉사 데이터를 가져오면서 기한이 지난 봉사 삭제
 
 app.listen(3000, console.log('Server running on Port 3000'));
+
+//할일
+//1. register 로직수정
+//2. 자동삭제 로직 개발
