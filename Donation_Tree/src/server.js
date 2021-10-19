@@ -97,28 +97,6 @@ app.post('/logout',(req,res)=>{
     res.send({"message":"로그아웃 되셨습니다"});
 });//로그아웃
 
-//중복확인
-app.post('/register/duplicate/id',(req,res)=>{
-    conn.query("select * from tree_user where id=?",[req.body.id],(err,result)=>{
-        if(result.length==0){
-            res.send({"result":true});
-        }
-        else{
-            res.send({"result":false});
-        }
-    });
-});//id중복확인
-app.post('/register/duplicate/mail',(req,res)=>{
-    conn.query("select * from tree_user where mail=?",[req.body.mails],(err,result)=>{
-        if(result.length==0){
-            res.send({"result":true});
-        }
-        else{
-            res.send({"result":false});
-        }
-    });
-});//mail중복확인
-
 //계정 복구
 app.post('/user/find/Id',(req,res)=>{
     conn.query("select * from tree_user where name=?",[req.body.name],(err,result)=>{
@@ -164,6 +142,28 @@ app.put('/user/change/Password',(req,res)=>{
         });
     });
 });//비밀번호 바꾸기
+
+//중복확인
+app.post('/register/duplicate/id',(req,res)=>{
+    conn.query("select * from tree_user where id=?",[req.body.id],(err,result)=>{
+        if(result.length==0){
+            res.send({"result":true});
+        }
+        else{
+            res.send({"result":false});
+        }
+    });
+});//id중복확인
+app.post('/register/duplicate/mail',(req,res)=>{
+    conn.query("select * from tree_user where mail=?",[req.body.mails],(err,result)=>{
+        if(result.length==0){
+            res.send({"result":true});
+        }
+        else{
+            res.send({"result":false});
+        }
+    });
+});//mail중복확인
 
 //봉사 관련
 app.post('/volunteer/participate',(req,res)=>{
@@ -513,7 +513,7 @@ app.post('/shop/insert',(req,res)=>{
         res.send({"product":true});
       }
     });
-});//상품 추가
+});//상품 추가(아마 관리자만 쓸듯?)
 
 setTimeout(()=>{
     var now=new Date();
@@ -575,6 +575,3 @@ setInterval(()=>{
 },43200000)//24시간(86400000ms)마다 봉사 데이터를 가져오면서 기한이 지난 봉사 삭제
 
 app.listen(3000, console.log('Server running on Port 3000'));
-
-//할일
-//2. 자동삭제 로직 개발
