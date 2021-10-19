@@ -374,6 +374,23 @@ app.get('/volunteer/list',(req,res)=>{
         res.send(arr);
     });
 });//모든봉사 목록 조회
+app.get('/volunteer/list/:field',(req,res)=>{
+    var arr=[];
+    var date=new Date(),str;
+    var year=date.getFullYear();
+    var month=date.getMonth()+1<10?("0"+(date.getMonth()+1)):String(date.getMonth()+1);
+    var day=date.getDate()<10?("0"+(date.getDate())):String(date.getDate());
+    str=Number(year+month+day);
+    conn.query('select * from volunteer_list where field like ?',["%"+req.params.field+"%"],(err,result)=>{
+        for(let i=0;i<result.length;i++){
+            if(result[i].end_date<str){
+                continue;
+            }
+            arr.push(result[i]);
+        }
+        res.send(arr);
+    });
+});//봉사 지역으로 필터링
 app.get('/volunteer/Participate',(req,res)=>{
     var arr=[];
     conn.query('select * from participate_volunteer where id=?',[req.session.userid],(err,result)=>{
@@ -520,7 +537,7 @@ setTimeout(()=>{
     console.log(now.getHours()+":"+now.getMinutes());
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
-    url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
+    url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent(0000);
     var result;
     request({
         url:url,
@@ -549,7 +566,7 @@ setInterval(()=>{
     console.log(now.getHours()+":"+now.getMinutes());
     var url='http://openapi.1365.go.kr/openapi/service/rest/VolunteerPartcptnService/getVltrCategoryList';//행정 안전부 open api
     url+='?'+encodeURIComponent('ServiceKey')+'='+volunteer_infor.serviceKey;
-    url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0800');
+    url+='&'+encodeURIComponent('UpperClCode')+'='+encodeURIComponent('0000');
     var result;
     request({
         url:url,
