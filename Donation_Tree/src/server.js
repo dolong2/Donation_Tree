@@ -165,24 +165,7 @@ app.post('/register/duplicate/mail',(req,res)=>{
     });
 });//mail중복확인
 
-//봉사 관련
-app.post('/volunteer/participate',(req,res)=>{
-    var v_id=req.body.volunteer_id;
-    if(req.session.userid){
-        conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[req.session.userid,v_id],(err,result)=>{
-            if(result.length==0){
-                conn.query('insert into participate_volunteer(id,volunteer_id,volunteer_title) value(?,?,?)',[req.session.userid,v_id,req.body.volunteer_name]);
-                res.send({"participate":"참가되었습니다"});
-            }
-            else{
-                res.send({"participate":"이미 신청한 봉사 입니다"});
-            }
-        });
-    }
-    else{
-        res.send({"participate":"로그인 되지 않았습니다"});
-    }
-});//봉사 신청
+//봉사 일지 관련
 app.post('/volunteer/diary',(req,res)=>{
     var user_id=req.session.userid,v_id=req.body.volunteer_id;
     var title=req.body.title,content=req.body.content;
@@ -246,7 +229,7 @@ app.get('/volunteer/diary/details',(req,res)=>{
     }
 });//봉사 일지 상세보기
 
-//조회
+//봉사 관련
 app.get('/volunteer/Tier',(req,res)=>{
     if(req.session.userid&&req.session.username){
         conn.query("select volunteer_hour from tree_user where id=?",[req.session.userid],(err,result)=>{
@@ -405,6 +388,23 @@ app.get('/volunteer/Participate',(req,res)=>{
         }
     });
 });//봉사 참가 목록 조회
+app.post('/volunteer/participate',(req,res)=>{
+    var v_id=req.body.volunteer_id;
+    if(req.session.userid){
+        conn.query('select * from participate_volunteer where id=? and volunteer_id=?',[req.session.userid,v_id],(err,result)=>{
+            if(result.length==0){
+                conn.query('insert into participate_volunteer(id,volunteer_id,volunteer_title) value(?,?,?)',[req.session.userid,v_id,req.body.volunteer_name]);
+                res.send({"participate":"참가되었습니다"});
+            }
+            else{
+                res.send({"participate":"이미 신청한 봉사 입니다"});
+            }
+        });
+    }
+    else{
+        res.send({"participate":"로그인 되지 않았습니다"});
+    }
+});//봉사 신청
 
 //기타
 app.get('/mypage',(req,res)=>{
@@ -532,6 +532,7 @@ app.post('/shop/insert',(req,res)=>{
     });
 });//상품 추가(아마 관리자만 쓸듯?)
 
+//자동화
 setTimeout(()=>{
     var now=new Date();
     console.log(now.getHours()+":"+now.getMinutes());
