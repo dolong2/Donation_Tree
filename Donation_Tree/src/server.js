@@ -195,7 +195,7 @@ app.post('/volunteer/diary',(req,res)=>{
         res.send({"volunteer_diary":"로그인 먼저 해주세요"})
     }
 });//봉사 일지 작성
-app.get('/volunteer/diary/all',(req,res)=>{
+app.get('/volunteer/diary',(req,res)=>{
     if(req.session.userid){
         conn.query("select * from volunteer_diary where id=?",[req.session.userid],(err,result)=>{
             var arr=[];
