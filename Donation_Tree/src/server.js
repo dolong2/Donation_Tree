@@ -549,6 +549,9 @@ setTimeout(()=>{
         var json=JSON.parse(result).response.body;
         for(let a of json.items.item){
             conn.query('select * from volunteer_list where volunteer_id=?',[a.progrmRegistNo._text],(err,result)=>{
+                if(err){
+                    console.log(err);
+                }
                 if(result.length==0){//봉사 ID로 조회하고 조회한 봉사ID가 없으면 새로 DB에 추가
                     conn.query('insert into volunteer_list value(?,?,?,?,?)',[a.progrmRegistNo._text,a.progrmSj._text,a.nanmmbyNm._text,a.progrmBgnde._text,a.progrmEndde._text]);
                 }
